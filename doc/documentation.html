@@ -1,0 +1,656 @@
+<html>
+  <head>
+
+    <title>NI USB-6501</title>
+
+    <style>
+table {
+	border-spacing: 0px;
+	border-collapse: collapse;
+}
+
+th, td {
+	border: thin solid;
+	text-align: center;
+	text-vertical-align: top;
+}
+
+dt {
+	font-weight: bold;
+}
+    </style>
+
+  </head>
+
+  <body>
+
+    <h1>NI USB-6501</h1>
+
+    <h2>General</h2>
+
+    <h3>About the device</h3>
+
+    <p>The NI USB-6501 is a USB digital IO module with 24 TTL IO lines group into 3 ports (<code>P0</code>-<code>P2</code>).</p>
+    <p>All IO lines can be configured as either input or output individually. Additionally, <code>P2.7</code> can be used as a counter triggered by high-to-low transitions.</p>
+
+    <h4>Pin assignment</h4>
+
+    <p>
+      <table>
+        <tr>
+          <th>Pin</th>
+          <th><code>1</code></th>
+          <th><code>2</code></th>
+          <th><code>3</code></th>
+          <th><code>4</code></th>
+          <th><code>5</code></th>
+          <th><code>6</code></th>
+          <th><code>7</code></th>
+          <th><code>8</code></th>
+          <th><code>9</code></th>
+          <th><code>10</code></th>
+          <th><code>11</code></th>
+          <th><code>12</code></th>
+          <th><code>13</code></th>
+          <th><code>14</code></th>
+          <th><code>15</code></th>
+          <th><code>16</code></th>
+        </tr>
+        <tr>
+          <th>Signal</th>
+          <td><code>GND</code></td>
+          <td><code>+5V</code></td>
+          <td><code>P1.7</code></td>
+          <td><code>P1.6</code></td>
+          <td><code>P1.5</code></td>
+          <td><code>P1.4</code></td>
+          <td><code>GND</code></td>
+          <td><code>GND</code></td>
+          <td><code>P2.7</code></td>
+          <td><code>P2.6</code></td>
+          <td><code>P2.5</code></td>
+          <td><code>P2.4</code></td>
+          <td><code>P2.3</code></td>
+          <td><code>P2.2</code></td>
+          <td><code>P2.1</code></td>
+          <td><code>P2.0</code></td>
+        </tr>
+        <tr>
+          <th>Pin</th>
+          <th><code>17</code></th>
+          <th><code>18</code></th>
+          <th><code>19</code></th>
+          <th><code>20</code></th>
+          <th><code>21</code></th>
+          <th><code>22</code></th>
+          <th><code>23</code></th>
+          <th><code>24</code></th>
+          <th><code>25</code></th>
+          <th><code>26</code></th>
+          <th><code>27</code></th>
+          <th><code>28</code></th>
+          <th><code>29</code></th>
+          <th><code>30</code></th>
+          <th><code>31</code></th>
+          <th><code>32</code></th>
+        </tr>
+        <tr>
+          <th>Signal</th>
+          <td><code>P0.0</code></td>
+          <td><code>P0.1</code></td>
+          <td><code>P0.2</code></td>
+          <td><code>P0.3</code></td>
+          <td><code>P0.4</code></td>
+          <td><code>P0.5</code></td>
+          <td><code>P0.6</code></td>
+          <td><code>P0.7</code></td>
+          <td><code>GND</code></td>
+          <td><code>GND</code></td>
+          <td><code>P1.0</code></td>
+          <td><code>P1.1</code></td>
+          <td><code>P1.2</code></td>
+          <td><code>P1.3</code></td>
+          <td><code>+5V</code></td>
+          <td><code>GND</code></td>
+        </tr>
+      </table>
+    </p>
+
+    <h3>USB message sequence</h3>
+
+    <p>The following sequence of USB bulk transfer messages is used to communicate with the device:</p>
+
+    <p>
+      <table>
+        <tr>
+          <th>r/w</th>
+          <th>register</th>
+          <th>content</th>
+        </tr>
+        <tr>
+          <td>&rarr;</td>
+          <td><code>OUT</code></td>
+          <td>request</td>
+        </tr>
+        <tr>
+          <td>&larr;</td>
+          <td><code>IN</code></td>
+          <td>response</td>
+        </tr>
+      </table>
+    </p>
+
+    <h3>USB end points</h3>
+
+    <p>
+      <table>
+        <tr>
+          <th>register</th>
+          <th>USB end point</th>
+        </tr>
+        <tr>
+          <td><code>IN</code></td>
+          <td><code>0x81</code></td>
+        </tr>
+        <tr>
+          <td><code>OUT</code></td>
+          <td><code>0x01</code></td>
+        </tr>
+      </table>
+    </p>
+
+    <h3>Packet format</h3>
+
+    <p>All packets consist of several 4 byte words. Values longer than 1 byte are in big endian byte order.</p>
+
+    <p>Both request and response packets have the same basic structure:</p>
+
+    <h4>Word #0</h4>
+
+    <p>
+      <table>
+        <tr>
+          <th><code>0</code></th>
+          <th><code>1</code></th>
+          <th><code>2</code></th>
+          <th><code>3</code></th>
+        </tr>
+        <tr>
+          <td><code>00</code></td>
+          <td><code>01</code></td>
+          <td><code>00</code></td>
+          <td><code>&lt;PL&gt;</code></td>
+        </tr>
+      </table>
+    </p>
+
+    <p>
+      <dl>
+        <dt><code>PL</code></dt>
+        <dd>packet length incl. header in bytes</dd>
+      </dl>
+    </p>
+
+    <h4>Word #1</h4>
+
+    <p>
+      <table>
+        <tr>
+          <th><code>0</code></th>
+          <th><code>1</code></th>
+          <th><code>2</code></th>
+          <th><code>3</code></th>
+        </tr>
+        <tr>
+          <td><code>00</code></td>
+          <td><code>&lt;DL&gt;</code></td>
+          <td><code>01</code></td>
+          <td><code>&lt;CMD&gt;</code></td>
+        </tr>
+      </table>
+    </p>
+
+    <p>
+      <dl>
+        <dt><code>DL</code></dt>
+        <dd>data length in bytes (= packet length - 4)</dd>
+        <dt><code>CMD</code></dt>
+        <dd>command</dd>
+      </dl>
+    </p>
+
+    <h4>Additional words</h4>
+
+    <p>Additional words are dependent on the command.</p>
+
+    <h3>Error behaviour</h3>
+
+    <p>If the device receives an invalid packet, it will not respond and has to be reset by disconnecting it from the USB bus.</p>
+
+    <h2>Commands</h2>
+
+    <p>In the request packets below, both first and second word are omitted, as they can be derived from the packet length and command. In the response packets, only the first word is omitted.</p>
+
+    <h3><code>0x09</code> &mdash; Start counter</h3>
+
+    <p>Request:<br />
+      <table>
+        <tr>
+          <th><code>0</code></th>
+          <th><code>1</code></th>
+          <th><code>2</code></th>
+          <th><code>3</code></th>
+        </tr>
+        <tr>
+          <td><code>02</code></td>
+          <td><code>20</code></td>
+          <td><code>00</code></td>
+          <td><code>00</code></td>
+        </tr>
+      </table>
+    </p>
+
+    <p>Response:<br />
+      <table>
+        <tr>
+          <th><code>0</code></th>
+          <th><code>1</code></th>
+          <th><code>2</code></th>
+          <th><code>3</code></th>
+          <th><code>4</code></th>
+          <th><code>5</code></th>
+          <th><code>6</code></th>
+          <th><code>7</code></th>
+        </tr>
+        <tr>
+          <td><code>00</code></td>
+          <td><code>08</code></td>
+          <td><code>01</code></td>
+          <td><code>00</code></td>
+          <td><code>00</code></td>
+          <td><code>00</code></td>
+          <td><code>00</code></td>
+          <td><code>02</code></td>
+        </tr>
+      </table>
+    </p>
+
+    <h3><code>0x0C</code> &mdash; Stop counter</h3>
+
+    <p>Request:<br />
+      <table>
+        <tr>
+          <th><code>0</code></th>
+          <th><code>1</code></th>
+          <th><code>2</code></th>
+          <th><code>3</code></th>
+        </tr>
+        <tr>
+          <td><code>02</code></td>
+          <td><code>20</code></td>
+          <td><code>00</code></td>
+          <td><code>00</code></td>
+        </tr>
+      </table>
+    </p>
+
+    <p>Response:<br />
+      <table>
+        <tr>
+          <th><code>0</code></th>
+          <th><code>1</code></th>
+          <th><code>2</code></th>
+          <th><code>3</code></th>
+          <th><code>4</code></th>
+          <th><code>5</code></th>
+          <th><code>6</code></th>
+          <th><code>7</code></th>
+        </tr>
+        <tr>
+          <td><code>00</code></td>
+          <td><code>08</code></td>
+          <td><code>01</code></td>
+          <td><code>00</code></td>
+          <td><code>00</code></td>
+          <td><code>00</code></td>
+          <td><code>00</code></td>
+          <td><code>02</code></td>
+        </tr>
+      </table>
+    </p>
+
+    <h3><code>0x0E</code> &mdash; Read port</h3>
+
+    <p>Request:<br />
+      <table>
+        <tr>
+          <th><code>0</code></th>
+          <th><code>1</code></th>
+          <th><code>2</code></th>
+          <th><code>3</code></th>
+          <th><code>4</code></th>
+          <th><code>5</code></th>
+          <th><code>6</code></th>
+          <th><code>7</code></th>
+        </tr>
+        <tr>
+          <td><code>02</code></td>
+          <td><code>10</code></td>
+          <td><code>00</code></td>
+          <td><code>00</code></td>
+          <td><code>00</code></td>
+          <td><code>03</code></td>
+          <td><code>&lt;PORT&gt;</code></td>
+          <td><code>00</code></td>
+        </tr>
+      </table>
+    </p>
+
+    <dl>
+      <dt><code>PORT</code></dt>
+      <dd>number of the port</dd>
+    </dl>
+
+    <p>Response:<br />
+      <table>
+        <tr>
+          <th><code>0</code></th>
+          <th><code>1</code></th>
+          <th><code>2</code></th>
+          <th><code>3</code></th>
+          <th><code>4</code></th>
+          <th><code>5</code></th>
+          <th><code>6</code></th>
+          <th><code>7</code></th>
+          <th><code>8</code></th>
+          <th><code>9</code></th>
+          <th><code>10</code></th>
+          <th><code>11</code></th>
+        </tr>
+        <tr>
+          <td><code>00</code></td>
+          <td><code>0C</code></td>
+          <td><code>01</code></td>
+          <td><code>00</code></td>
+          <td><code>00</code></td>
+          <td><code>00</code></td>
+          <td><code>00</code></td>
+          <td><code>02</code></td>
+          <td><code>00</code></td>
+          <td><code>03</code></td>
+          <td><code>&lt;BMAP&gt;</code></td>
+          <td><code>00</code></td>
+        </tr>
+      </table>
+    </p>
+
+    <dl>
+      <dt><code>BMAP</code></dt>
+      <dd>bit map</dd>
+    </dl>
+
+    <h3><code>0x0E</code> &mdash; Read counter</h3>
+
+    <p>Request:<br />
+      <table>
+        <tr>
+          <th><code>0</code></th>
+          <th><code>1</code></th>
+          <th><code>2</code></th>
+          <th><code>3</code></th>
+        </tr>
+        <tr>
+          <td><code>02</code></td>
+          <td><code>20</code></td>
+          <td><code>00</code></td>
+          <td><code>00</code></td>
+        </tr>
+      </table>
+    </p>
+
+    <p>Response:<br />
+      <table>
+        <tr>
+          <th><code>0</code></th>
+          <th><code>1</code></th>
+          <th><code>2</code></th>
+          <th><code>3</code></th>
+          <th><code>4</code></th>
+          <th><code>5</code></th>
+          <th><code>6</code></th>
+          <th><code>7</code></th>
+          <th><code>8</code></th>
+          <th><code>9</code></th>
+          <th><code>10</code></th>
+          <th><code>11</code></th>
+        </tr>
+        <tr>
+          <td><code>00</code></td>
+          <td><code>0C</code></td>
+          <td><code>01</code></td>
+          <td><code>00</code></td>
+          <td><code>00</code></td>
+          <td><code>00</code></td>
+          <td><code>00</code></td>
+          <td><code>02</code></td>
+          <td colspan="4"><code>&lt;CNT&gt;</code></td>
+        </tr>
+      </table>
+    </p>
+
+    <dl>
+      <dt><code>CNT</code></dt>
+      <dd>value of the counter</dd>
+    </dl>
+
+    <h3><code>0x0F</code> &mdash; Write port</h3>
+
+    <p>Request:<br />
+      <table>
+        <tr>
+          <th><code>0</code></th>
+          <th><code>1</code></th>
+          <th><code>2</code></th>
+          <th><code>3</code></th>
+          <th><code>4</code></th>
+          <th><code>5</code></th>
+          <th><code>6</code></th>
+          <th><code>7</code></th>
+          <th><code>8</code></th>
+          <th><code>9</code></th>
+          <th><code>10</code></th>
+          <th><code>11</code></th>
+        </tr>
+        <tr>
+          <td><code>02</code></td>
+          <td><code>10</code></td>
+          <td><code>00</code></td>
+          <td><code>00</code></td>
+          <td><code>00</code></td>
+          <td><code>03</code></td>
+          <td><code>&lt;PORT&gt;</code></td>
+          <td><code>00</code></td>
+          <td><code>03</code></td>
+          <td><code>&lt;BMAP&gt;</code></td>
+          <td><code>00</code></td>
+          <td><code>00</code></td>
+        </tr>
+      </table>
+    </p>
+
+    <dl>
+      <dt><code>PORT</code></dt>
+      <dd>number of the port</dd>
+      <dt><code>BMAP</code></dt>
+      <dd>bit map</dd>
+    </dl>
+
+    <p>Response:<br />
+      <table>
+        <tr>
+          <th><code>0</code></th>
+          <th><code>1</code></th>
+          <th><code>2</code></th>
+          <th><code>3</code></th>
+          <th><code>4</code></th>
+          <th><code>5</code></th>
+          <th><code>6</code></th>
+          <th><code>7</code></th>
+        </tr>
+        <tr>
+          <td><code>00</code></td>
+          <td><code>08</code></td>
+          <td><code>01</code></td>
+          <td><code>00</code></td>
+          <td><code>00</code></td>
+          <td><code>00</code></td>
+          <td><code>00</code></td>
+          <td><code>02</code></td>
+        </tr>
+      </table>
+    </p>
+
+    <h3><code>0x0F</code> &mdash; Write counter</h3>
+
+    <p>Request:<br />
+      <table>
+        <tr>
+          <th><code>0</code></th>
+          <th><code>1</code></th>
+          <th><code>2</code></th>
+          <th><code>3</code></th>
+          <th><code>4</code></th>
+          <th><code>5</code></th>
+          <th><code>6</code></th>
+          <th><code>7</code></th>
+        </tr>
+        <tr>
+          <td><code>02</code></td>
+          <td><code>20</code></td>
+          <td><code>00</code></td>
+          <td><code>00</code></td>
+          <td colspan="4"><code>&lt;CNT&gt;</code></td>
+        </tr>
+      </table>
+    </p>
+
+    <dl>
+      <dt><code>CNT</code></dt>
+      <dd>value of the counter</dd>
+    </dl>
+
+    <p>Response:<br />
+      <table>
+        <tr>
+          <th><code>0</code></th>
+          <th><code>1</code></th>
+          <th><code>2</code></th>
+          <th><code>3</code></th>
+          <th><code>4</code></th>
+          <th><code>5</code></th>
+          <th><code>6</code></th>
+          <th><code>7</code></th>
+        </tr>
+        <tr>
+          <td><code>00</code></td>
+          <td><code>08</code></td>
+          <td><code>01</code></td>
+          <td><code>00</code></td>
+          <td><code>00</code></td>
+          <td><code>00</code></td>
+          <td><code>00</code></td>
+          <td><code>02</code></td>
+        </tr>
+      </table>
+    </p>
+
+    <h3><code>0x12</code> &mdash; Set in/out mode</h3>
+
+    <p>Request:<br />
+      <table>
+        <tr>
+          <th><code>0</code></th>
+          <th><code>1</code></th>
+          <th><code>2</code></th>
+          <th><code>3</code></th>
+          <th><code>4</code></th>
+          <th><code>5</code></th>
+          <th><code>6</code></th>
+          <th><code>7</code></th>
+          <th><code>8</code></th>
+          <th><code>9</code></th>
+          <th><code>10</code></th>
+          <th><code>11</code></th>
+          <th><code>12</code></th>
+          <th><code>13</code></th>
+          <th><code>14</code></th>
+          <th><code>15</code></th>
+        </tr>
+        <tr>
+          <td><code>02</code></td>
+          <td><code>10</code></td>
+          <td><code>00</code></td>
+          <td><code>00</code></td>
+          <td><code>00</code></td>
+          <td><code>05</code></td>
+          <td><code>&lt;M0&gt;</code></td>
+          <td><code>&lt;M1&gt;</code></td>
+          <td><code>&lt;M2&gt;</code></td>
+          <td><code>00</code></td>
+          <td><code>05</code></td>
+          <td><code>00</code></td>
+          <td><code>00</code></td>
+          <td><code>00</code></td>
+          <td><code>00</code></td>
+          <td><code>00</code></td>
+        </tr>
+      </table>
+    </p>
+
+    <dl>
+      <dt><code>M0-M2</code></dt>
+      <dd>mask for the port 0-2 (<code>0</code> = input, <code>1</code> = output)</dd>
+    </dl>
+
+    <p>Response:<br />
+      <table>
+        <tr>
+          <th><code>0</code></th>
+          <th><code>1</code></th>
+          <th><code>2</code></th>
+          <th><code>3</code></th>
+          <th><code>4</code></th>
+          <th><code>5</code></th>
+          <th><code>6</code></th>
+          <th><code>7</code></th>
+        </tr>
+        <tr>
+          <td><code>00</code></td>
+          <td><code>08</code></td>
+          <td><code>01</code></td>
+          <td><code>00</code></td>
+          <td><code>00</code></td>
+          <td><code>00</code></td>
+          <td><code>00</code></td>
+          <td><code>02</code></td>
+        </tr>
+      </table>
+    </p>
+
+    <h2>Demo program</h2>
+
+    <p>A library (<code>niusb6501.c</code> and <code>niusb6501.h</code>) and a demo program in C (<code>demo.c</code>) is included, with examples for using the digital input/ouput and the counter functionality.</p>
+    <p>To compile it, type <code>make</code>. You need to have libusb (and headers) installed. Also, ensure your user is allowed to write to the files in <code>/dev/bus/usb</code>.</p>
+
+    <h2>Disclaimer</h2>
+
+    <p>As National Instruments decided not to make the protocol specification for this device available, I had to work it out myself by installing the Labview driver in Windows and looking at the communication with a USB sniffer. The sniffer logs are included in the directory <code>usb-logs</code> without any further documentation for the sake of completeness.</p>
+    <p>I still don't understand many details of the protocol, although what I do know is enough to use it for most purposes. I'm publishing this documentation in the hope that it is useful for others. In no way should it be regarded as complete or without errors. Use it on your own risk.</p>
+
+    <h2>Contact</h2>
+
+    <p>For questions and comments contact:</p>
+    <p>Marc Sch&uuml;tz &lt;<a href="mailto:schuetzm@gmx.net">schuetzm@gmx.net</a>&gt;</p>
+
+  </body>
+</html>

@@ -1,0 +1,9 @@
+The NI USB-6501 is a digital IO module for USB from National Instruments.
+Unfortunately, their driver for Linux is excessively large (> 60M!) and
+didn't work. So we decided to analyze the USB protocol and write our own
+driver.
+
+The result can be found in the directory c/.
+
+For further details, have a look at doc/documentation.html.
+
